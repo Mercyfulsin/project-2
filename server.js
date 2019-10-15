@@ -64,10 +64,11 @@ app.engine(
 app.set("view engine", "handlebars");
 // config express-session
 var sess = {
-  secret: 'CHANGE THIS SECRET',
+  secret: process.env.SESS_SECRET,
   cookie: {},
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
+  secureCookie: (process.env.NODE_ENV === 'production')
 };
 
 if (app.get('env') === 'production') {
