@@ -17,6 +17,17 @@ var debug = require('debug')('nodejs-regular-webapp2:server');
 var http = require('http');
 var db = require("./models");
 dotenv.config();
+var SequelizeStore = require('connect-session-sequelize')(session.Store);
+if (config.use_env_variable) {
+  var sequelize = new Sequelize(process.env[config.use_env_variable]);
+} else {
+  var sequelize = new Sequelize(
+    config.database,
+    config.username,
+    config.password,
+    config
+  );
+}
 
 var app = express();
 
@@ -68,6 +79,9 @@ var sess = {
   cookie: {},
   resave: false,
   saveUninitialized: true,
+  store: new SequelizeStore({
+    db: sequelize
+  }),
   secureCookie: (process.env.NODE_ENV === 'production')
 };
 
