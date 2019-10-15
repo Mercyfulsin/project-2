@@ -5,10 +5,7 @@ var exphbs = require("express-handlebars");
 var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
-var Sequelize = require('sequelize');
 var session = require('express-session');
-var env = process.env.NODE_ENV || "development";
-var config = require("./config/config.js")[env];
 var dotenv = require('dotenv');
 var passport = require('passport');
 var Auth0Strategy = require('passport-auth0');
@@ -20,13 +17,6 @@ var debug = require('debug')('nodejs-regular-webapp2:server');
 var http = require('http');
 var db = require("./models");
 dotenv.config();
-var SequelizeStore = require('connect-session-sequelize')(session.Store);
-var sequelize = new Sequelize(
-  config.database,
-  config.username,
-  config.password,
-  config
-);
 
 var app = express();
 
@@ -39,7 +29,7 @@ var strategy = new Auth0Strategy(
     callbackURL:
       process.env.AUTH0_CALLBACK_URL || 'http://localhost:3000/callback'
   },
-  function (accessToken, refreshToken, extraParams, profile, done) {
+  function(accessToken, refreshToken, extraParams, profile, done) {
     // accessToken is the token to call Auth0 API (not needed in the most cases)
     // extraParams.id_token has the JSON Web Token
     // profile has all the information from the user
@@ -78,9 +68,7 @@ var sess = {
   cookie: {},
   resave: false,
   saveUninitialized: true,
-  store: new SequelizeStore({
-    db: sequelize
-  }),
+  // store:,
   secureCookie: (process.env.NODE_ENV === 'production')
 };
 
