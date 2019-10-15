@@ -67,12 +67,10 @@ var sess = {
   secret: process.env.SESS_SECRET,
   cookie: {},
   resave: false,
-  saveUninitialized: true,
-  // store:,
-  secureCookie: (process.env.NODE_ENV === 'production')
+  saveUninitialized: true
 };
 
-if (app.get('env') === 'production') {
+if (app.get('env') === 'development') {
   sess.cookie.secure = true; // serve secure cookies, requires https
 }
 
