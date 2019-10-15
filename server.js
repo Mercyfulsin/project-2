@@ -70,7 +70,7 @@ var sess = {
   saveUninitialized: true
 };
 
-if (app.get('env') === 'development') {
+if (app.get('env') === 'production') {
   sess.cookie.secure = true; // serve secure cookies, requires https
 }
 
@@ -96,7 +96,6 @@ app.use(function (req, res, next) {
 app.use(userInViews());
 app.use('/', authRouter);
 app.use('/', indexRouter);
-// app.use('/', usersRouter);
 // Routes
 require("./routes/apiRoutes")(app);
 require("./routes/htmlRoutes")(app);
