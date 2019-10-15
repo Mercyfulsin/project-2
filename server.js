@@ -5,7 +5,10 @@ var exphbs = require("express-handlebars");
 var path = require('path');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
+var Sequelize = require('sequelize');
 var session = require('express-session');
+var env = process.env.NODE_ENV || "development";
+var config = require("./config/config.js")[env];
 var dotenv = require('dotenv');
 var passport = require('passport');
 var Auth0Strategy = require('passport-auth0');
@@ -18,16 +21,12 @@ var http = require('http');
 var db = require("./models");
 dotenv.config();
 var SequelizeStore = require('connect-session-sequelize')(session.Store);
-if (config.use_env_variable) {
-  var sequelize = new Sequelize(process.env[config.use_env_variable]);
-} else {
-  var sequelize = new Sequelize(
-    config.database,
-    config.username,
-    config.password,
-    config
-  );
-}
+var sequelize = new Sequelize(
+  config.database,
+  config.username,
+  config.password,
+  config
+);
 
 var app = express();
 
@@ -40,7 +39,7 @@ var strategy = new Auth0Strategy(
     callbackURL:
       process.env.AUTH0_CALLBACK_URL || 'http://localhost:3000/callback'
   },
-  function(accessToken, refreshToken, extraParams, profile, done) {
+  function (accessToken, refreshToken, extraParams, profile, done) {
     // accessToken is the token to call Auth0 API (not needed in the most cases)
     // extraParams.id_token has the JSON Web Token
     // profile has all the information from the user
@@ -51,11 +50,11 @@ var strategy = new Auth0Strategy(
 passport.use(strategy);
 
 // You can use this section to keep a smaller payload
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
   done(null, user);
 });
 
-passport.deserializeUser(function(user, done) {
+passport.deserializeUser(function (user, done) {
   done(null, user);
 });
 
@@ -98,7 +97,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash());
 
 // Handle auth failure error messages
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   if (req && req.query && req.query.error) {
     req.flash('error', req.query.error);
   }
@@ -116,7 +115,7 @@ app.use('/', indexRouter);
 require("./routes/apiRoutes")(app);
 require("./routes/htmlRoutes")(app);
 // Catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   const err = new Error('Not Found');
   err.status = 404;
   next(err);
@@ -127,7 +126,7 @@ app.use(function(req, res, next) {
 // Development error handler
 // Will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
+  app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
@@ -138,7 +137,7 @@ if (app.get('env') === 'development') {
 
 // Production error handler
 // No stacktraces leaked to user
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('404', {
     message: err.message,
@@ -165,7 +164,7 @@ if (process.env.NODE_ENV === "test") {
  * Listen on provided PORT, on all network interfaces.
  */
 // Starting the server, syncing our models ------------------------------------/
-db.sequelize.sync(syncOptions).then(function() {
+db.sequelize.sync(syncOptions).then(function () {
   // Models/tables
   console.log("START");
   // Relations
@@ -181,7 +180,7 @@ db.sequelize.sync(syncOptions).then(function() {
   console.log("8");
   db.Chats.belongsTo(db.Matches, { foreignKey: 'matchID' });
 
-  server.listen(PORT, function() {
+  server.listen(PORT, function () {
     console.log(
       "==> 🌎  Listening on PORT %s. Visit http://localhost:%s/ in your browser.",
       PORT,
